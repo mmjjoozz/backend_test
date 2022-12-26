@@ -12,8 +12,21 @@ class ProductSchema(Schema):
 class OrderSchema(Schema):
     class Meta:
         model = Orders
-        fields = ("id", "order_price", "product_id", "discount_pc", "date_created", "date_updated", "product")
+        fields = ("id", "actual_price", "product_id", "product")
 
     product = fields.Nested(ProductSchema, data_key="product_info")
     product_id = fields.Int(required=True)
-    order_price = fields.Int(required=True)
+    actual_price = fields.Int(required=True)
+
+
+class OrderUpdateSchema(Schema):
+    """
+    Only use for validating incoming PUT requests to check that no extraneous fields are provided and no
+    nonsense (strings etc) gets inserted.
+    """
+
+    class Meta:
+        model = Orders
+
+    product_id = fields.Int(required=False)
+    actual_price = fields.Int(required=False)

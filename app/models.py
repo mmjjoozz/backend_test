@@ -1,5 +1,4 @@
-from sqlalchemy import (Column, DateTime, Float, ForeignKey, Integer, String,
-                        UniqueConstraint)
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -17,9 +16,6 @@ class Products(Base):
 class Orders(Base):
     __tablename__ = "orders"
     id = Column(Integer, primary_key=True)
-    order_price = Column(Integer())
-    discount_pc = Column(Float())
+    actual_price = Column(Integer())
     product_id = Column(Integer(), ForeignKey("products.id"))
-    date_created = Column(DateTime(timezone=True), server_default=func.now())
-    date_updated = Column(DateTime(timezone=True), onupdate=func.now())
     product = relationship("Products")
