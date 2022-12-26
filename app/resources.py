@@ -1,6 +1,9 @@
+import json
+
 from flask import make_response, request
 from flask_restful import Resource, abort
 from marshmallow.exceptions import ValidationError
+from sqlalchemy.sql import func
 
 from app.db import db_session as db
 from app.models import Orders, Products
@@ -27,7 +30,6 @@ class Order(Resource):
 
         resp_json = schema.dump(order)
         return make_response(resp_json, 200)
-
 
     def delete(self, order_id):
         pass
@@ -68,4 +70,5 @@ class Order(Resource):
 
 class Metrics(Resource):
     def get(self):
-        pass
+        res = db.query(Products.name, func.avg(Orders.discount_pc)).join(Products).group_by(Products.name).all()
+        return make_response(json.dumps(dict(res)), 200)
