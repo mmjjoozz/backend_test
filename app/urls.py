@@ -1,5 +1,6 @@
 from flask_restful import Api
-from app.resources import Order, Metrics
+
+from app.resources import Metrics, Order
 
 api = Api(prefix="/orders")
 
