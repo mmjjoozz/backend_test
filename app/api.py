@@ -5,7 +5,7 @@ db = SQLAlchemy()
 from app.config import DevConfig
 
 
-def create_app(config):
+def create_app(config=DevConfig):
     from app.models import Orders, Products
     from app.urls import api
 
@@ -20,4 +20,4 @@ def create_app(config):
         return app
 
 
-app = create_app(DevConfig)
+app = create_app()
