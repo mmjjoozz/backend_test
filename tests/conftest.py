@@ -6,13 +6,16 @@ from app.models import Orders, Products
 
 
 def preload_data():
-    db.session.add(Products(id=1, name="Catamaran", list_price=5000))
-    db.session.add(Products(id=2, name="Dinghy", list_price=90))
-    db.session.add(Orders(product_id=1, actual_price=2500))
-    db.session.add(Orders(product_id=1, actual_price=1000))
-    db.session.add(Orders(product_id=2, actual_price=40))
-    db.session.add(Orders(product_id=2, actual_price=56))
-    db.session.add(Orders(product_id=2, actual_price=120))
+    objects = [
+        Products(name="Catamaran", list_price=5000),
+        Products(name="Dinghy", list_price=90),
+        Orders(product_id=1, actual_price=2500),
+        Orders(product_id=1, actual_price=1000),
+        Orders(product_id=2, actual_price=40),
+        Orders(product_id=2, actual_price=56),
+        Orders(product_id=2, actual_price=120)
+    ]
+    db.session.bulk_save_objects(objects)
     db.session.commit()
 
 
