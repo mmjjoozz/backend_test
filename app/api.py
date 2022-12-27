@@ -18,7 +18,7 @@ def create_app(config=DevConfig):
         db.create_all()
         products = db.session.query(Products).all()
         # Pre-populate DB with some info
-        if not products:
+        if not products and not app.config["TESTING"]:
             objects = [
                 Products(name="Catamaran", list_price=1000),
                 Products(name="Dinghy", list_price=150),
