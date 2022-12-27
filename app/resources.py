@@ -11,7 +11,7 @@ from app.models import Orders, Products
 from app.schemas import OrderSchema, OrderUpdateSchema
 
 
-def bad_request(error_code, message={}):
+def bad_request(error_code, message=""):
     response = jsonify({"message": message})
     response.status_code = error_code
     return response
@@ -61,7 +61,7 @@ class Order(Resource):
 
         if data.get("product_id"):
             if not db.session.query(Products).get(data["product_id"]):
-                bad_request(404, message="Product ID not found.")
+                return bad_request(404, message="Product ID not found.")
 
             order.product_id = data["product_id"]
         if data.get("actual_price"):
@@ -82,7 +82,7 @@ class Order(Resource):
 
         product = db.session.query(Products).get((data["product_id"]))
         if not product:
-            bad_request(404, message="Product ID not found.")
+            return bad_request(404, message="Product ID not found.")
 
         actual_price = data["actual_price"]
 
