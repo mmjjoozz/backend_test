@@ -1,21 +1,17 @@
-from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String, UniqueConstraint
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-
-from app.db import Base
+from app.api import db
 
 
-class Products(Base):
+class Products(db.Model):
     __tablename__ = "products"
-    id = Column(Integer, primary_key=True)
-    name = Column(String(100))
-    list_price = Column(Integer())
-    __table_args__ = (UniqueConstraint("name", "list_price", name="_name_price_uc"),)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    list_price = db.Column(db.Integer())
+    __table_args__ = (db.UniqueConstraint("name", "list_price", name="_name_price_uc"),)
 
 
-class Orders(Base):
+class Orders(db.Model):
     __tablename__ = "orders"
-    id = Column(Integer, primary_key=True)
-    actual_price = Column(Integer())
-    product_id = Column(Integer(), ForeignKey("products.id"))
-    product = relationship("Products")
+    id = db.Column(db.Integer, primary_key=True)
+    actual_price = db.Column(db.Integer())
+    product_id = db.Column(db.Integer(), db.ForeignKey("products.id"))
+    product = db.relationship("Products")

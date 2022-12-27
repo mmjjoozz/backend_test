@@ -1,14 +1,23 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
-from app.db import init_db
+db = SQLAlchemy()
+from app.config import DevConfig
 
 
-def create_app():
+def create_app(config):
+    from app.models import Orders, Products
     from app.urls import api
 
     app = Flask(__name__)
-
+    app.config.from_object(config)
     api.init_app(app)
-    init_db()
 
-    return app
+    with app.app_context():
+        db.init_app(app)
+        db.create_all()
+
+        return app
+
+
+app = create_app(DevConfig)

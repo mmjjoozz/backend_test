@@ -1,13 +1,20 @@
 import json
 
-from flask import make_response, request, Response
+from flask import Response, make_response, request
+from flask.json import jsonify
 from flask_restful import Resource, abort
 from marshmallow.exceptions import ValidationError
 from sqlalchemy.sql import func
 
-from app.db import db_session as db
+from app.api import db
 from app.models import Orders, Products
 from app.schemas import OrderSchema, OrderUpdateSchema
+
+
+def bad_request(error_code, message={}):
+    response = jsonify({"message": message})
+    response.status_code = error_code
+    return response
 
 
 class Order(Resource):
@@ -16,51 +23,51 @@ class Order(Resource):
             args = request.args
             if args and "product_name" in args:
                 product_name = args.get("product_name")
-                orders = db.query(Orders).join(Products).filter(Products.name == product_name)
+                orders = db.session.query(Orders).join(Products).filter(Products.name == product_name)
             else:
-                orders = db.query(Orders).all()
+                orders = db.session.query(Orders).all()
 
             resp_json = OrderSchema(many=True).dump(orders)
             return make_response(resp_json, 200)
 
         schema = OrderSchema()
-        order = db.query(Orders).get(order_id)
+        order = db.session.query(Orders).get(order_id)
         if not order:
-            abort(404, message="Order ID not found.")
+            return bad_request(404, message="Order ID not found.")
 
         resp_json = schema.dump(order)
         return make_response(resp_json, 200)
 
     def delete(self, order_id):
-        order = db.query(Orders).get(order_id)
+        order = db.session.query(Orders).get(order_id)
         if not order:
-            abort(404, message="Product ID not found.")
+            return bad_request(404, message="Order ID not found.")
 
-        db.delete(order)
-        db.commit()
-        return make_response("Success.", 200)
+        db.session.delete(order)
+        db.session.commit()
+        return make_response("Success.", 204)
 
     def put(self, order_id):
-        order = db.query(Orders).get(order_id)
-        if not order:
-            abort(404, message="Order ID not found.")
-
         data = request.get_json()
         schema = OrderUpdateSchema()
         try:
             schema.load(data)
-        except ValidationError as e:
-            abort(422, message=e)
+        except ValidationError:
+            return bad_request(422, message="Validation error.")
+
+        order = db.session.query(Orders).get(order_id)
+        if not order:
+            return bad_request(404, message="Order ID not found.")
 
         if data.get("product_id"):
-            if not db.query(Products).get(data["product_id"]):
-                abort(404, message="Product ID not found.")
+            if not db.session.query(Products).get(data["product_id"]):
+                bad_request(404, message="Product ID not found.")
 
             order.product_id = data["product_id"]
         if data.get("actual_price"):
             order.actual_price = data["actual_price"]
 
-        db.commit()
+        db.session.commit()
 
         resp_json = OrderSchema().dump(order)
         return make_response(resp_json, 200)
@@ -70,12 +77,12 @@ class Order(Resource):
         schema = OrderSchema()
         try:
             schema.load(data)
-        except ValidationError as e:
-            abort(422, message=e)
+        except ValidationError:
+            return bad_request(422, message="Validation error.")
 
-        product = db.query(Products).get((data["product_id"]))
+        product = db.session.query(Products).get((data["product_id"]))
         if not product:
-            abort(404, message="Product ID not found.")
+            bad_request(404, message="Product ID not found.")
 
         actual_price = data["actual_price"]
 
@@ -83,8 +90,8 @@ class Order(Resource):
             product_id=product.id,
             actual_price=actual_price,
         )
-        db.add(order)
-        db.commit()
+        db.session.add(order)
+        db.session.commit()
 
         resp_json = schema.dump(order)
         return make_response(resp_json, 201)
@@ -103,7 +110,7 @@ class Metrics(Resource):
 
     def get(self):
         metrics = {}
-        qs = db.query(Orders).join(Products)
+        qs = db.session.query(Orders).join(Products)
         for q in qs:
             product = q.product
             discount_pct = (1 - (q.actual_price / product.list_price)) * 100
@@ -115,4 +122,4 @@ class Metrics(Resource):
         metrics_avg = {
             k: 0 if sum(v) / len(v) <= 0 else round((sum(v) / len(v)), 2) for k, v in metrics.items() if sum(v) != 0
         }
-        return make_response(json.dumps(dict(metrics_avg)), 200)
+        return make_response(jsonify(dict(metrics_avg)), 200)
