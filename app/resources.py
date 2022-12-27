@@ -1,10 +1,7 @@
-import json
-
-from flask import Response, make_response, request
+from flask import make_response, request
 from flask.json import jsonify
-from flask_restful import Resource, abort
+from flask_restful import Resource
 from marshmallow.exceptions import ValidationError
-from sqlalchemy.sql import func
 
 from app.api import db
 from app.models import Orders, Products
