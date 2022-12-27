@@ -8,7 +8,7 @@
 
 - Set up a virtual environment using virtualenv, Pipenv etc.
 - If using virtualenv, run `pip install -r requirements.txt`
-- Once requirements are installed, go to project's root, run `export FLASK_APP=app/api.py` and following that, the app can be run using `flask run` from root dir. Running with wsgi is also an option
+- Once requirements are installed, go to project's root, run `export FLASK_APP=app/api.py` and following that, the app can be run using `flask run`. Running with wsgi is also an option
 - SQLAlchemy will automatically create a sqlite3 database in the `/instance` directory. On the first application run several `Products` will be inserted into the DB for convenient testing. Those are based on the schema and data I've been given as part of this challenge.
 
 ## Unit testing
