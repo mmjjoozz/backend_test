@@ -18,7 +18,7 @@
 ## Assumptions, notes, caveats
 - Since DRF was mentioned in the initial interview, I thought it would be a good idea to use a similar framework here - the project is built with Flask-Restful, allowing me to structure the code in a much more readable and clean way than if I used pure Flask. Thus the `orders.py` file became `resources.py`. 
 - I took the liberty to remove the `init_db.py` file and included the same functionality on application startup - data prepopulation is still there, via SQLAlchemy ORM (again - ORM's were talked about during the initial interview).
-- I've kept the database design pretty much the same. Some unique constraints are places on the combination of boat name + price to avoid any accidental redundancy.
+- I've kept the database design pretty much the same. Some unique constraints are placed on the combination of boat name + price to avoid any accidental redundancy.
 - In a real life scenario the tables would be much more complex - we'd probably want some extra fields for keeping track of the amount of boats we've got available, creation and update times etc., however, I've decided against any extras to keep the project as close to the original boilerplate as possible.
 - With the above in mind, I've decided to allow an unlimited amount of orders to be made per each boat type. This is intentional - in my mind I was building an API for a proper store with lots of boats.
 - I've assumed that each boat's sale price will depend on negotiations, therefore e.g. a Catamaran can have different discounts depending on whatever the customer has negotiated. The `/metrics` endpoint returns the average of all discounts for a boat.
